@@ -1,3 +1,3 @@
-# article-test
+# godem
 
-kumparan SE test
+Golang DDD patern template
