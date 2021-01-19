@@ -1,0 +1,16 @@
+server:
+  port: 3000
+
+databases:
+  master:
+    conn_string: "root:toor@tcp(localhost:3306)/article"
+    driver: "mysql"
+  slave:
+    driver: "mysql"
+    conn_string: "root:toor@tcp(localhost:3306)/article"
+
+redis:
+  address: ""
+  timeout: 5
+  max_iddle: 10
+  max_active: 10
