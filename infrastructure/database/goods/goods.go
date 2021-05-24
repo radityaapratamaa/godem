@@ -3,6 +3,7 @@ package goods
 import (
 	"bcg-test/domain/models"
 	"bcg-test/domain/models/goods"
+	goodsmodel "bcg-test/domain/models/goods"
 	"bcg-test/infrastructure/database"
 	"context"
 	"fmt"
@@ -13,7 +14,7 @@ import (
 
 type goodsIface interface {
 	database.CRUD
-	GetQtyOfGoodsByName(ctx context.Context, name string) (int64, error)
+	GetDetailByName(ctx context.Context, name string) (*goodsmodel.Goods, error)
 	UpdateStock(ctx context.Context, action string, id int64, qty int) (*models.CUDResponse, error)
 }
 
@@ -53,13 +54,13 @@ func (repo *Repository) UpdateStock(ctx context.Context, action string, id int64
 	return result, nil
 }
 
-func (repo *Repository) GetQtyOfGoodsByName(ctx context.Context, name string) (int64, error) {
-	query := "SELECT qty FROM goods WHERE deleted_at IS NULL and name = ?"
+func (repo *Repository) GetDetailByName(ctx context.Context, name string) (*goodsmodel.Goods, error) {
+	query := "SELECT * FROM goods WHERE deleted_at IS NULL and name = ?"
 
 	query = repo.db.Slave.Rebind(query)
-	var result int64
+	var result *goodsmodel.Goods
 	if err := repo.db.Slave.SelectContext(ctx, &result, query, name); err != nil {
-		return 0, errors.Wrap(err, "infrastructure.database.article.GetList")
+		return nil, errors.Wrap(err, "infrastructure.database.article.GetList")
 	}
 	return result, nil
 }
