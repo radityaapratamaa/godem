@@ -1,10 +1,12 @@
 package main
 
 import (
-	"article-test/infrastructure/config"
 	"log"
 
 	"github.com/pkg/errors"
+
+	"bcg-test/infrastructure/config"
+	"bcg-test/infrastructure/service/_internal/http/api"
 )
 
 func main() {
@@ -14,4 +16,8 @@ func main() {
 		log.Fatalln("cannot read config: ", errors.Cause(err).Error())
 	}
 	log.Printf("%#v", cfg)
+	modules := loadModules(cfg)
+
+	handler := api.NewHandler(modules)
+	log.Fatalln(handler.RegisterAndStartServer())
 }
