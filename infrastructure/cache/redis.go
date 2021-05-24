@@ -1,7 +1,7 @@
 package cache
 
 import (
-	"article-test/domain/models"
+	"bcg-test/domain/models"
 	"context"
 	"sync"
 	"time"

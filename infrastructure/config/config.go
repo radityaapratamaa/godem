@@ -1,8 +1,8 @@
 package config
 
 import (
-	"article-test/domain/models"
-	"article-test/lib/helper"
+	"bcg-test/domain/models"
+	"bcg-test/lib/helper"
 	"fmt"
 	"log"
 	"os"
