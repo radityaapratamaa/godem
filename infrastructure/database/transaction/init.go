@@ -1,9 +1,9 @@
-package article
+package transaction
 
-import "article-test/domain/models"
+import "bcg-test/domain/models"
 
 type Repositories interface {
-	article
+	purchase
 }
 
 type Repository struct {

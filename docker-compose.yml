@@ -1,0 +1,32 @@
+version: '3.2'
+volumes:
+  locals:
+    driver: ${VOLUME_DRIVER}
+networks:
+  apps:
+    driver: ${NETWORK_DRIVER}
+
+services:
+  db:
+    build:
+      context: ./.docker/mysql
+      args:
+        - MYSQL_VERSION=${MYSQL_VERSION}
+    environment:
+      - MYSQL_USER=${SONARQUBE_MYSQL_USER}
+      - MYSQL_PASSWORD=${SONARQUBE_MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - TZ=${WORKSPACE_TIMEZONE}
+    volumes:
+      - ${DATA_PATH_HOST}/mysql:/var/lib/mysql
+      - ${MYSQL_ENTRYPOINT_INITDB}:/docker-entrypoint-initdb.d
+    ports:
+      - "${MYSQL_PORT}:3306"
+    networks:
+      - apps
+
+
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379

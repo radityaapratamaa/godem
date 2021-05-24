@@ -1,7 +1,7 @@
 package database
 
 import (
-	"article-test/domain/models"
+	"bcg-test/domain/models"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"

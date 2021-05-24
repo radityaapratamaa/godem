@@ -3,11 +3,11 @@ server:
 
 databases:
   master:
-    conn_string: "root:toor@tcp(localhost:3306)/article"
+    conn_string: "root:toor@tcp(localhost:3306)/bcg"
     driver: "mysql"
   slave:
     driver: "mysql"
-    conn_string: "root:toor@tcp(localhost:3306)/article"
+    conn_string: "root:toor@tcp(localhost:3306)/bcg"
 
 redis:
   address: ""
