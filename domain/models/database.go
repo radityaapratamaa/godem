@@ -1,12 +1,5 @@
 package models
 
-import "github.com/jmoiron/sqlx"
-
-type Database struct {
-	Master *sqlx.DB
-	Slave  *sqlx.DB
-}
-
 type SelectResponse struct {
 	RequestParam  interface{} `json:"request_param"`
 	Data          interface{} `json:"data"`

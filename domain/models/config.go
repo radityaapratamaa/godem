@@ -1,8 +1,18 @@
 package models
 
 type Config struct {
+	Server    ServerConfig    `yaml:"server"`
+	JWT       JWTConfig       `yaml:"jwt"`
 	Databases DatabasesConfig `yaml:"databases"`
 	Redis     RedisCfg        `yaml:"redis"`
+}
+
+type ServerConfig struct {
+	Port string `yaml:"port"`
+}
+
+type JWTConfig struct {
+	PublicKey string `yaml:"public_key"`
 }
 
 type RedisCfg struct {
@@ -13,8 +23,8 @@ type RedisCfg struct {
 }
 
 type DatabasesConfig struct {
-	Master DatabaseConfig `yaml:"master"`
-	Slave  DatabaseConfig `yaml:"slave"`
+	Master   DatabaseConfig `yaml:"master"`
+	Follower DatabaseConfig `yaml:"follower"`
 }
 
 type DatabaseConfig struct {
