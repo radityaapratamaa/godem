@@ -1,7 +1,7 @@
 package database
 
 import (
-	"bcg-test/domain/models"
+	"godem/domain/models"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -9,23 +9,38 @@ import (
 	"github.com/pkg/errors"
 )
 
-func Connect(cfg *models.Config) (*models.Database, error) {
+type DB struct {
+	Master
+	Follower
+	master   *sqlx.DB
+	follower *sqlx.DB
+	timeout  time.Duration
+}
+
+func newDB(master, follower *sqlx.DB) *DB {
+	return &DB{
+		Master:   master,
+		Follower: follower,
+		master:   master,
+		follower: follower,
+		timeout:  3 * time.Second,
+	}
+}
+
+func Connect(cfg *models.Config) (*DB, error) {
 
 	masterDB, err := connectDB(&cfg.Databases.Master)
 	if err != nil {
 		return nil, errors.Wrap(err, "lib.util.database.ConnectMaster")
 	}
 
-	slaveDB, err := connectDB(&cfg.Databases.Slave)
+	followerDB, err := connectDB(&cfg.Databases.Slave)
 	if err != nil {
 		return nil, errors.Wrap(err, "lib.util.database.ConnectSlave")
 	}
 
-	database := &models.Database{
-		Master: masterDB,
-		Slave:  slaveDB,
-	}
-	return database, nil
+	db := newDB(masterDB, followerDB)
+	return db, nil
 }
 
 func connectDB(cfg *models.DatabaseConfig) (*sqlx.DB, error) {
