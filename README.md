@@ -1,5 +1,5 @@
-# BCG koding test
-
+# Godem
+Golang Development Template with DDD pattern
 ## How to start
 please run this command to running the DB
 ```bash
