@@ -5,8 +5,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"bcg-test/infrastructure/config"
-	"bcg-test/infrastructure/service/_internal/http/api"
+	"godem/infrastructure/config"
+	"godem/infrastructure/service/_internal/http/api"
 )
 
 func main() {

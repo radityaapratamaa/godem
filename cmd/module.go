@@ -1,12 +1,12 @@
 package main
 
 import (
-	"bcg-test/domain/models"
-	"bcg-test/infrastructure/database/transaction"
-	"bcg-test/infrastructure/service/_internal/http/api"
-	transactionhandler "bcg-test/infrastructure/service/_internal/http/api/transaction"
-	"bcg-test/lib/util/database"
-	transactionuc "bcg-test/usecase/transaction"
+	"godem/domain/models"
+	"godem/infrastructure/database/user"
+	"godem/infrastructure/service/_internal/http/api"
+	userhandler "godem/infrastructure/service/_internal/http/api/user"
+	"godem/lib/util/database"
+	useruc "godem/usecase/user"
 	"log"
 )
 
@@ -16,11 +16,11 @@ func loadModules(cfg *models.Config) *api.ModuleHandler {
 		log.Fatalln("Cannot connect to DB", err.Error())
 	}
 
-	transactionRepo := transaction.New(mainDB)
-	transactionUsecase := transactionuc.New(transactionRepo, nil)
-	transactionHandler := transactionhandler.New(transactionUsecase)
+	userRepo := user.NewMaster(mainDB)
+	userUsecase := useruc.New(userRepo)
+	userHandler := userhandler.NewHandler(userUsecase.Master())
 
 	return &api.ModuleHandler{
-		Transaction: transactionHandler,
+		User: userHandler,
 	}
 }
