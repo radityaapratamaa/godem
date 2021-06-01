@@ -26,8 +26,11 @@ func loadModules(cfg *models.Config) (*api.ModuleHandler, *middleware.Auth) {
 	// Usecase Section
 	userUsecase := useruc.New(userRepo, loginRepo, cfg.JWT.PublicKey)
 	jwtUsecase := jwt.New(cfg.JWT.PublicKey)
+
+	// Handler Section
 	userHandler := userhandler.NewHandler(userUsecase.Master(), userUsecase.Login())
 	jwtHandler := jwthandler.NewHandler(jwtUsecase.JWT())
+
 	return &api.ModuleHandler{
 		User: userHandler,
 		JWT:  jwtHandler,
