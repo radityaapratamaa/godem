@@ -1,13 +1,16 @@
 server:
   port: 3000
 
+jwt:
+  public_key: "myPubl1Ck3Y"
+
 databases:
   master:
-    conn_string: "root:toor@tcp(localhost:3306)/bcg"
+    conn_string: "root:toor@tcp(localhost:3306)/profiling"
     driver: "mysql"
-  slave:
+  follower:
     driver: "mysql"
-    conn_string: "root:toor@tcp(localhost:3306)/bcg"
+    conn_string: "root:toor@tcp(localhost:3306)/profiling"
 
 redis:
   address: ""
