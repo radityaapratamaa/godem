@@ -16,8 +16,8 @@ func main() {
 		log.Fatalln("cannot read config: ", errors.Cause(err).Error())
 	}
 	log.Printf("%#v", cfg)
-	modules := loadModules(cfg)
+	modules, authMiddleware := loadModules(cfg)
 
-	handler := api.NewHandler(modules)
+	handler := api.NewHandler(modules, authMiddleware)
 	log.Fatalln(handler.RegisterAndStartServer())
 }
