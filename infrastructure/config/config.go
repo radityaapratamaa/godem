@@ -1,9 +1,9 @@
 package config
 
 import (
-	"bcg-test/domain/models"
-	"bcg-test/lib/helper"
 	"fmt"
+	"godem/domain/models"
+	"godem/lib/helper"
 	"log"
 	"os"
 	"path/filepath"

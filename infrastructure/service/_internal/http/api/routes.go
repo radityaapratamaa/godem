@@ -1,27 +1,27 @@
 package api
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 
-	"bcg-test/infrastructure/service/_internal/http/api/transaction"
+	"godem/infrastructure/service/_internal/http/api/user"
+	"godem/lib/util/response"
 )
 
 type Routes struct {
-	router  *mux.Router
+	router  *chi.Mux
 	modules *ModuleHandler
 }
 
 type ModuleHandler struct {
-	Transaction transaction.Handlers
+	User *user.Handler
 }
 
 func NewHandler(modules *ModuleHandler) *Routes {
 	return &Routes{
-		router:  mux.NewRouter().StrictSlash(true),
+		router:  chi.NewRouter(),
 		modules: modules,
 	}
 }
@@ -29,20 +29,27 @@ func NewHandler(modules *ModuleHandler) *Routes {
 func (h *Routes) RegisterAndStartServer() error {
 
 	//register your routes here
-	h.router.HandleFunc("/ping", h.Ping)
+	h.router.Get("/ping", h.Ping)
 
-	// transaction routes start
-	h.router.HandleFunc("/transaction/purchase", h.modules.Transaction.CreateNew)
+	h.router.Route("/user", func(user chi.Router) {
+		user.Get("/", h.modules.User.Master().GetList)
+		user.Get("/{id}", h.modules.User.Master().GetDetailByID)
+		user.Post("/", h.modules.User.Master().CreateNew)
+		user.Patch("/{id}", h.modules.User.Master().UpdateData)
+		user.Delete("/{id}", h.modules.User.Master().DeleteData)
+
+	})
 
 	log.Println("http listening on port :10000")
 	return http.ListenAndServe(":10000", h.router)
 }
 
 func (h *Routes) Ping(w http.ResponseWriter, r *http.Request) {
-	response := map[string]interface{}{
+	data := map[string]interface{}{
 		"code":    200,
 		"message": "OK",
 	}
 
-	json.NewEncoder(w).Encode(response)
+	resp := response.NewJSON()
+	resp.Success(data).Send(w)
 }
