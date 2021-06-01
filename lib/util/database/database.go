@@ -34,7 +34,7 @@ func Connect(cfg *models.Config) (*DB, error) {
 		return nil, errors.Wrap(err, "lib.util.database.ConnectMaster")
 	}
 
-	followerDB, err := connectDB(&cfg.Databases.Slave)
+	followerDB, err := connectDB(&cfg.Databases.Follower)
 	if err != nil {
 		return nil, errors.Wrap(err, "lib.util.database.ConnectSlave")
 	}
