@@ -18,16 +18,16 @@ type JWTs interface {
 	GetJWTClaim(ctx context.Context) (*jwtmodel.Claim, error)
 }
 
-type JWT struct {
+type jwtU struct {
 	signingKey string
 	keyFunc    jwt.Keyfunc
 }
 
-func NewJWT(signingKey string) *JWT {
-	return &JWT{signingKey: signingKey}
+func NewJWT(signingKey string) *jwtU {
+	return &jwtU{signingKey: signingKey}
 }
 
-func (u *JWT) DecodeToken(ctx context.Context, token string) (*jwtmodel.Claim, error) {
+func (u *jwtU) DecodeToken(ctx context.Context, token string) (*jwtmodel.Claim, error) {
 	if u.signingKey == "" {
 		err := errors.New("JWT Signing Key is nil")
 		return nil, errors.Wrap(err, "usecase.jwt.DecodeToken.CheckSigningKey")
@@ -63,7 +63,7 @@ func (u *JWT) DecodeToken(ctx context.Context, token string) (*jwtmodel.Claim, e
 	return &result, nil
 }
 
-func (u *JWT) GetJWTClaim(ctx context.Context) (*jwtmodel.Claim, error) {
+func (u *jwtU) GetJWTClaim(ctx context.Context) (*jwtmodel.Claim, error) {
 	jwtClaimData := ctxinternal.GetJWT(ctx)
 	if jwtClaimData == nil {
 		notFoundJWT := errors.New("JWT is not valid")

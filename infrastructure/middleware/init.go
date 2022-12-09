@@ -1,15 +1,22 @@
 package middleware
 
-import "godem/usecase/jwt"
+import (
+	"godem/infrastructure/middleware/auth"
+	"godem/usecase/jwt"
+)
 
-type Auth struct {
-	jwt *JWT
+type Definitions struct {
+	auth auth.Middlewares
 }
 
-func NewAuth(jwtUc jwt.JWTs) *Auth {
-	return &Auth{jwt: NewJWT(jwtUc)}
+type Modules struct {
+	JWTUc jwt.Usecases
 }
 
-func (a *Auth) JWT() *JWT {
-	return a.jwt
+func New(middlewareModules *Modules) *Definitions {
+	return &Definitions{auth: auth.New(middlewareModules.JWTUc)}
+}
+
+func (a *Definitions) Auth() auth.Middlewares {
+	return a.auth
 }

@@ -2,25 +2,32 @@ package user
 
 import (
 	"context"
+	"github.com/kodekoding/phastos/go/common"
+	"github.com/kodekoding/phastos/go/database"
+	"github.com/kodekoding/phastos/go/database/action"
 	"godem/domain/models/user"
-	"godem/lib/util/database"
 
 	"github.com/pkg/errors"
 )
 
 type Logins interface {
+	common.RepoCRUD
 	Authenticate(ctx context.Context, requestData *user.LoginRequest) (*user.Users, error)
 }
 
-type Login struct {
-	db *database.DB
+type login struct {
+	*action.Base
+	db *database.SQL
 }
 
-func NewLogin(db *database.DB) *Login {
-	return &Login{db: db}
+func newLogin(db *database.SQL) *login {
+	return &login{
+		db:   db,
+		Base: action.NewBase(db, "login"),
+	}
 }
 
-func (l *Login) Authenticate(ctx context.Context, requestData *user.LoginRequest) (*user.Users, error) {
+func (l *login) Authenticate(ctx context.Context, requestData *user.LoginRequest) (*user.Users, error) {
 	query := `SELECT * FROM users WHERE username = ? and passwd = md5(?) and deleted_at IS NULL`
 	query = l.db.Rebind(query)
 

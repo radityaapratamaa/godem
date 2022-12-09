@@ -15,7 +15,7 @@ type Logins interface {
 	Authenticate(ctx context.Context, requestData *user.LoginRequest) (*user.LoginResponse, error)
 }
 
-type Login struct {
+type login struct {
 	jwtPubKey string
 	repo      userdb.Logins
 }
@@ -25,11 +25,11 @@ var (
 	decodeBase64String = (base64.StdEncoding).DecodeString
 )
 
-func NewLogin(repo userdb.Logins, jwtPubKey string) *Login {
-	return &Login{repo: repo, jwtPubKey: jwtPubKey}
+func newLogin(repo userdb.Logins, jwtPubKey string) *login {
+	return &login{repo: repo, jwtPubKey: jwtPubKey}
 }
 
-func (l *Login) Authenticate(ctx context.Context, requestData *user.LoginRequest) (*user.LoginResponse, error) {
+func (l *login) Authenticate(ctx context.Context, requestData *user.LoginRequest) (*user.LoginResponse, error) {
 	realPass, err := decodeBase64String(requestData.Password)
 	if err != nil {
 		return nil, errors.Wrap(err, "usecase.user.login.Authenticate.DecodePassword")

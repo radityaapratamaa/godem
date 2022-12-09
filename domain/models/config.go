@@ -1,18 +1,30 @@
 package models
 
+import (
+	"github.com/kodekoding/phastos/go/database"
+	"github.com/kodekoding/phastos/go/notifications"
+	"github.com/kodekoding/phastos/go/server"
+)
+
 type Config struct {
-	Server    ServerConfig    `yaml:"server"`
-	JWT       JWTConfig       `yaml:"jwt"`
-	Databases DatabasesConfig `yaml:"databases"`
-	Redis     RedisCfg        `yaml:"redis"`
+	Server        server.Config        `yaml:"server"`
+	JWT           JWTConfig            `yaml:"jwt"`
+	Databases     database.SQLs        `yaml:"databases"`
+	Redis         RedisCfg             `yaml:"redis"`
+	Notifications notifications.Config `yaml:"notifications"`
 }
 
 type ServerConfig struct {
-	Port string `yaml:"port"`
+	Port    string `yaml:"port"`
+	Timeout struct {
+		Read  int `yaml:"read"`
+		Write int `yaml:"write"`
+	} `yaml:"timeout"`
 }
 
 type JWTConfig struct {
-	PublicKey string `yaml:"public_key"`
+	PublicKey  string `yaml:"public_key"`
+	SigningKey string `yaml:"signing_key"`
 }
 
 type RedisCfg struct {

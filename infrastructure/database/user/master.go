@@ -3,32 +3,33 @@ package user
 import (
 	"context"
 	"fmt"
-	"godem/lib/util/database"
-
+	"github.com/kodekoding/phastos/go/database"
 	"github.com/pkg/errors"
+	"godem/infrastructure/common"
 
 	"godem/domain/models"
 	"godem/domain/models/user"
-	"godem/infrastructure/common"
 )
 
 type Masters interface {
 	common.CRUD
 }
 
-type Master struct {
-	db *database.DB
+type master struct {
+	db *database.SQL
 }
 
-func NewMaster(db *database.DB) *Master {
-	return &Master{db: db}
+func newMaster(db *database.SQL) *master {
+	return &master{
+		db: db,
+	}
 }
 
 func generateLikeParams(data interface{}) string {
 	return fmt.Sprintf("%%%s%%", data)
 }
 
-func (repo *Master) GetList(ctx context.Context, requestData interface{}) (interface{}, error) {
+func (repo *master) GetList(ctx context.Context, requestData interface{}) (interface{}, error) {
 	userRequestData, valid := requestData.(*user.UsersRequest)
 	if !valid {
 		errMsg := errors.New("The Request Data must be userRequest struct")
@@ -51,7 +52,7 @@ func (repo *Master) GetList(ctx context.Context, requestData interface{}) (inter
 	return result, nil
 }
 
-func (repo *Master) GetDetailByID(ctx context.Context, id int64) (interface{}, error) {
+func (repo *master) GetDetailByID(ctx context.Context, id int64) (interface{}, error) {
 	query := "SELECT id, username, role, address, created_at, updated_at, deleted_at FROM users WHERE id = ? and deleted_at is NULL"
 	query = repo.db.Rebind(query)
 	var result user.Users
@@ -61,7 +62,7 @@ func (repo *Master) GetDetailByID(ctx context.Context, id int64) (interface{}, e
 	return &result, nil
 }
 
-func (repo *Master) CreateNew(ctx context.Context, requestData interface{}) (*models.CUDResponse, error) {
+func (repo *master) CreateNew(ctx context.Context, requestData interface{}) (*models.CUDResponse, error) {
 	userData, valid := requestData.(*user.Users)
 	if !valid {
 		errMsg := errors.New("The Request Data must be Goods struct")
@@ -88,7 +89,7 @@ func (repo *Master) CreateNew(ctx context.Context, requestData interface{}) (*mo
 	return result, nil
 }
 
-func (repo *Master) UpdateData(ctx context.Context, requestData interface{}, id int64) (*models.CUDResponse, error) {
+func (repo *master) UpdateData(ctx context.Context, requestData interface{}, id int64) (*models.CUDResponse, error) {
 	userData, valid := requestData.(*user.Users)
 	if !valid {
 		errMsg := errors.New("The Request Data must be Goods struct")
@@ -115,7 +116,7 @@ func (repo *Master) UpdateData(ctx context.Context, requestData interface{}, id 
 	return result, nil
 }
 
-func (repo *Master) DeleteData(ctx context.Context, id int64) (*models.CUDResponse, error) {
+func (repo *master) DeleteData(ctx context.Context, id int64) (*models.CUDResponse, error) {
 
 	query := "UPDATE users SET deleted_at=now() WHERE id=?"
 	query = repo.db.Rebind(query)

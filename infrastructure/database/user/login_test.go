@@ -2,10 +2,10 @@ package user
 
 import (
 	"context"
+	"github.com/kodekoding/phastos/go/database"
 	"godem/domain/models/user"
 	"godem/infrastructure/common"
 	"godem/infrastructure/database/mocks"
-	"godem/lib/util/database"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -16,9 +16,9 @@ import (
 var (
 	masterRepo   *mocks.Master
 	followerRepo *mocks.Follower
-	db           *database.DB
-	login        *Login
-	master       *Master
+	db           *database.SQL
+	loginUser    *login
+	masterUser   *master
 )
 
 const (
@@ -30,12 +30,12 @@ const (
 func initTest() {
 	masterRepo = new(mocks.Master)
 	followerRepo = new(mocks.Follower)
-	db = &database.DB{
+	db = &database.SQL{
 		Master:   masterRepo,
 		Follower: followerRepo,
 	}
-	login = NewLogin(db)
-	master = NewMaster(db)
+	loginUser = newLogin(db)
+	masterUser = newMaster(db)
 }
 
 func TestLogin_Authenticate(t *testing.T) {
@@ -56,7 +56,7 @@ func TestLogin_Authenticate(t *testing.T) {
 				return nil
 			}).Once()
 
-		actualResult, err := login.Authenticate(context.Background(), mockRequest)
+		actualResult, err := loginUser.Authenticate(context.Background(), mockRequest)
 		assert.Equal(t, expectedResult, actualResult)
 		assert.Equal(t, false, err != nil)
 	})
@@ -67,7 +67,7 @@ func TestLogin_Authenticate(t *testing.T) {
 		followerRepo.On(StrGetContext, mockParams...).
 			Return(common.ErrPatch).Once()
 
-		actualResult, err := login.Authenticate(context.Background(), mockRequest)
+		actualResult, err := loginUser.Authenticate(context.Background(), mockRequest)
 		assert.Equal(t, expectedResult, actualResult)
 		assert.Equal(t, true, err != nil)
 	})

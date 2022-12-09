@@ -1,5 +1,9 @@
 package jwt
 
+type Usecases interface {
+	JWT() JWTs
+}
+
 type Usecase struct {
 	jwt JWTs
 }

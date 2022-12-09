@@ -1,63 +1,80 @@
 package api
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
-	"github.com/go-chi/chi/v5"
+	"github.com/kodekoding/phastos/go/router"
 
-	"godem/infrastructure/middleware"
-	"godem/infrastructure/service/_internal/http/api/jwt"
-	"godem/infrastructure/service/_internal/http/api/user"
-	"godem/lib/util/response"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/cors"
 )
 
-type Routes struct {
-	router  *chi.Mux
-	modules *ModuleHandler
-	auth    *middleware.Auth
-}
-
-type ModuleHandler struct {
-	User *user.Handler
-	JWT  *jwt.Handler
-}
-
-func NewHandler(modules *ModuleHandler, authHandler *middleware.Auth) *Routes {
-	return &Routes{
-		router:  chi.NewRouter(),
-		modules: modules,
-		auth:    authHandler,
+type (
+	Routes interface {
+		Register()
 	}
+	Route struct {
+		handler      Handlers
+		handle       router.RouteInterface
+		listOfRoutes map[string][]string
+	}
+)
+
+func NewRoutes(handlers Handlers) *Route {
+	return &Route{handle: router.NewChiRouter(), handler: handlers, listOfRoutes: make(map[string][]string)}
 }
 
-func (h *Routes) RegisterAndStartServer() error {
+func (r *Route) GetHandler() *chi.Mux {
+	return r.handle.GetHandler()
+}
 
-	//register your routes here
-	h.router.Get("/ping", h.Ping)
-	h.router.Post("/login", h.modules.User.Login().Authenticate)
-
-	h.router.Route("/user", func(user chi.Router) {
-		user.Use(h.auth.JWT().ValidateGroup)
-		user.Get("/", h.modules.User.Master().GetList)
-		user.Get("/{id}", h.modules.User.Master().GetDetailByID)
-		user.Post("/", h.modules.User.Master().CreateNew)
-		user.Patch("/{id}", h.modules.User.Master().UpdateData)
-		user.Delete("/{id}", h.modules.User.Master().DeleteData)
+func (r *Route) Register() {
+	route := r.handle
+	//tracer, closer := jaeger.NewTracer(
+	//	"serviceName",
+	//	jaeger.NewConstSampler(true),
+	//	jaeger.NewInMemoryReporter(),
+	//)
+	//defer closer.Close()
+	route.InitRoute(cors.Options{
+		AllowedOrigins: []string{"https://*", "http://*"},
+		AllowedMethods: []string{"PATCH", "POST", "DELETE", "GET", "PUT"},
+		AllowedHeaders: []string{"Origin", "token", "content-type", "Content-Type", "Authorization"},
+		MaxAge:         60 * 60, //1 hour
 	})
 
-	h.router.Get("/token", h.auth.JWT().Validate(h.modules.JWT.Claim().GetJWTClaim))
+	//buat url image setelah di upload
+	//route.StaticFS("/upload/images", http.Dir(upload.GetImageFullPath()))
 
-	log.Println("http listening on port :10000")
-	return http.ListenAndServe(":10000", h.router)
+	//handler := r.handler.Modules()
+	//swagger url
+	//route.Get("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	route.Get("/ping", r.handler.Ping)
+	const prefix string = "/api"
+
+	go func() {
+		r.trackAllRoutes()
+	}()
+}
+func (r *Route) appendRoutes(method, route string) {
+	r.listOfRoutes[route] = append(r.listOfRoutes[route], method)
 }
 
-func (h *Routes) Ping(w http.ResponseWriter, r *http.Request) {
-	data := map[string]interface{}{
-		"code":    200,
-		"message": "OK",
+func (r *Route) trackAllRoutes() {
+	endpointCount := 0
+	walkFunc := func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
+		route = strings.Replace(route, "/*/", "/", -1)
+		r.appendRoutes(method, route)
+		endpointCount++
+		return nil
 	}
 
-	resp := response.NewJSON()
-	resp.Success(data).Send(w)
+	if err := chi.Walk(r.handle.GetHandler(), walkFunc); err != nil {
+		fmt.Printf("Logging err: %s\n", err.Error())
+	}
+	log.Printf("Served %d endpoints", endpointCount)
+
 }

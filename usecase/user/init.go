@@ -2,15 +2,20 @@ package user
 
 import "godem/infrastructure/database/user"
 
+type Usecases interface {
+	Master() Masters
+	Login() Logins
+}
+
 type Usecase struct {
 	master Masters
 	login  Logins
 }
 
-func New(masterRepo user.Masters, loginRepo user.Logins, jwtPubKey string) *Usecase {
+func New(userRepo user.Repositories, jwtPubKey string) *Usecase {
 	return &Usecase{
-		master: NewMaster(masterRepo),
-		login:  NewLogin(loginRepo, jwtPubKey),
+		master: newMaster(userRepo.Master()),
+		login:  newLogin(userRepo.Login(), jwtPubKey),
 	}
 }
 
