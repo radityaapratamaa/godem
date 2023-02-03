@@ -17,3 +17,12 @@ redis:
   timeout: 5
   max_iddle: 10
   max_active: 10
+
+notifications:
+  telegram:
+    is_active: false
+    bot_token: ""
+    chat_id:
+  slack:
+    is_active: false
+    webhook_url: ""
