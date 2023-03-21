@@ -1,17 +1,17 @@
 package main
 
 import (
-	"log"
-	"net/http"
-
 	"github.com/kodekoding/phastos/go/server"
 	"github.com/pkg/errors"
 	"github.com/unrolled/secure"
+	"godem/infrastructure/service/_internal/router/component"
+	"log"
+	"net/http"
 
 	"godem/infrastructure/config"
 	"godem/infrastructure/loader"
+	"godem/infrastructure/middleware"
 	"godem/infrastructure/service/_internal/http/api"
-	"godem/infrastructure/service/_internal/router/component"
 )
 
 func main() {
@@ -20,15 +20,19 @@ func main() {
 	if err != nil {
 		log.Fatalln("cannot read config: ", errors.Cause(err).Error())
 	}
+	log.Printf("%#v", cfg)
 	modules := loader.InitModules(cfg)
-	wrapper := loader.InitWrapper(cfg)
-	middlewares := loader.InitMiddleware(modules.Auth)
+	wrappers := loader.InitWrapper(cfg)
+	middlewares := middleware.New(modules.Auth)
 
-	handler := api.NewHandler(modules, wrapper, middlewares)
+	handler := api.NewHandler(modules, wrappers, middlewares)
+
 	routeHandler := loadHandler(handler)
-	cfgServer := cfg.Server
-	cfgServer.Handler = routeHandler
-	log.Fatalln(server.ServeHTTP(&cfgServer))
+	serverConfig := cfg.Server
+	serverConfig.Handler = routeHandler
+	if err = server.ServeHTTP(&serverConfig); err != nil {
+		log.Printf("failed to serve:+%v\n", err)
+	}
 }
 
 func loadHandler(this *api.Handler) http.Handler {
@@ -46,6 +50,5 @@ func loadHandler(this *api.Handler) http.Handler {
 	this.HttpHandler = secureMiddleware.Handler(this.HttpHandler)
 
 	this.HttpHandler = component.WrapNotif(this.HttpHandler, this.Wrapper().Notif)
-	this.HttpHandler = component.WrapApp(this.HttpHandler, this.Wrapper().Apps)
 	return this.HttpHandler
 }

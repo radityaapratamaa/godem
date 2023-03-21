@@ -12,6 +12,15 @@ type Config struct {
 	Databases     database.SQLs        `yaml:"databases"`
 	Redis         RedisCfg             `yaml:"redis"`
 	Notifications notifications.Config `yaml:"notifications"`
+	Apps          ThirdPartyApps       `yaml:"apps"`
+}
+
+type ThirdPartyApps struct {
+	Slack Slack `yaml:"slack"`
+}
+
+type Slack struct {
+	BotToken string `yaml:"bot_token"`
 }
 
 type ServerConfig struct {

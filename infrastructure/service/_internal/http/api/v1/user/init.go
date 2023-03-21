@@ -2,13 +2,18 @@ package user
 
 import "godem/usecase/user"
 
+type Handlers interface {
+	Master() Masters
+	Login() Logins
+}
+
 type Handler struct {
 	master Masters
 	login  Logins
 }
 
-func NewHandler(masterUc user.Masters, loginUc user.Logins) *Handler {
-	return &Handler{master: NewMaster(masterUc), login: NewLogin(loginUc)}
+func New(userUc user.Usecases) *Handler {
+	return &Handler{master: newMaster(userUc.Master()), login: newLogin(userUc.Login())}
 }
 
 func (h *Handler) Master() Masters {

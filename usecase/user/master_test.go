@@ -21,16 +21,16 @@ func TestMaster_GetList(t *testing.T) {
 			RequestParam: mockRequestData,
 			Data:         mockGetListResponse,
 		}
-		master.On("GetList", mock.Anything, mock.Anything).
+		masterRepo.On("GetList", mock.Anything, mock.Anything).
 			Return(mockGetListResponse, nil).Once()
-		actualResult, err := uc.master.GetList(context.Background(), mockRequestData)
+		actualResult, err := masterUc.GetList(context.Background(), mockRequestData)
 		assert.Equal(t, expectedResult, actualResult)
 		assert.Equal(t, false, err != nil)
 	})
 	t.Run("Case 2 - Failed", func(t *testing.T) {
-		master.On("GetList", mock.Anything, mock.Anything).
+		masterRepo.On("GetList", mock.Anything, mock.Anything).
 			Return(nil, common.ErrPatch).Once()
-		actualResult, err := uc.master.GetList(context.Background(), mockRequestData)
+		actualResult, err := masterUc.GetList(context.Background(), mockRequestData)
 		assert.Equal(t, nil, actualResult)
 		assert.Equal(t, true, err != nil)
 	})
@@ -41,16 +41,16 @@ func TestMaster_GetDetailByID(t *testing.T) {
 	mockRequestData := int64(1)
 	t.Run("Case 1 - Success", func(t *testing.T) {
 		expectedResult := &usermodel.Users{ID: 1}
-		master.On("GetDetailByID", mock.Anything, mock.Anything).
+		masterRepo.On("GetDetailByID", mock.Anything, mock.Anything).
 			Return(expectedResult, nil).Once()
-		actualResult, err := uc.master.GetDetailByID(context.Background(), mockRequestData)
+		actualResult, err := masterUc.GetDetailByID(context.Background(), mockRequestData)
 		assert.Equal(t, expectedResult, actualResult)
 		assert.Equal(t, false, err != nil)
 	})
 	t.Run("Case 2 - Failed", func(t *testing.T) {
-		master.On("GetDetailByID", mock.Anything, mock.Anything).
+		masterRepo.On("GetDetailByID", mock.Anything, mock.Anything).
 			Return(nil, common.ErrPatch).Once()
-		actualResult, err := uc.master.GetDetailByID(context.Background(), mockRequestData)
+		actualResult, err := masterUc.GetDetailByID(context.Background(), mockRequestData)
 		assert.Equal(t, nil, actualResult)
 		assert.Equal(t, true, err != nil)
 	})
@@ -61,9 +61,9 @@ func TestMaster_CreateNew(t *testing.T) {
 	mockRequestData := &usermodel.Users{}
 	t.Run("Case 1 - Success", func(t *testing.T) {
 		expectedResult := &models.CUDResponse{}
-		master.On("CreateNew", mock.Anything, mock.Anything).
+		masterRepo.On("CreateNew", mock.Anything, mock.Anything).
 			Return(expectedResult, nil).Once()
-		actualResult, err := uc.master.CreateNew(context.Background(), mockRequestData)
+		actualResult, err := masterUc.CreateNew(context.Background(), mockRequestData)
 		assert.Equal(t, expectedResult, actualResult)
 		assert.Equal(t, false, err != nil)
 	})
@@ -75,16 +75,16 @@ func TestMaster_UpdateData(t *testing.T) {
 	mockID := int64(1)
 	expectedResult := &models.CUDResponse{}
 	t.Run("Case 1 - Success", func(t *testing.T) {
-		master.On("UpdateData", mock.Anything, mock.Anything, mock.Anything).
+		masterRepo.On("UpdateData", mock.Anything, mock.Anything, mock.Anything).
 			Return(expectedResult, nil).Once()
-		actualResult, err := uc.master.UpdateData(context.Background(), mockRequestData, mockID)
+		actualResult, err := masterUc.UpdateData(context.Background(), mockRequestData, mockID)
 		assert.Equal(t, expectedResult, actualResult)
 		assert.Equal(t, false, err != nil)
 	})
 	expectedResult = nil
 	t.Run("Case 2 - Failed Parse Interface", func(t *testing.T) {
 		newMockRequestData := &usermodel.LoginResponse{}
-		actualResult, err := uc.master.UpdateData(context.Background(), newMockRequestData, mockID)
+		actualResult, err := masterUc.UpdateData(context.Background(), newMockRequestData, mockID)
 		assert.Equal(t, expectedResult, actualResult)
 		assert.Equal(t, true, err != nil)
 	})
@@ -94,9 +94,9 @@ func TestMaster_DeleteData(t *testing.T) {
 	initTest()
 	t.Run("Case 1 - Success", func(t *testing.T) {
 		expectedResult := &models.CUDResponse{}
-		master.On("DeleteData", mock.Anything, mock.Anything).
+		masterRepo.On("DeleteData", mock.Anything, mock.Anything).
 			Return(expectedResult, nil).Once()
-		actualResult, err := uc.master.DeleteData(context.Background(), int64(1))
+		actualResult, err := masterUc.DeleteData(context.Background(), int64(1))
 		assert.Equal(t, expectedResult, actualResult)
 		assert.Equal(t, false, err != nil)
 	})

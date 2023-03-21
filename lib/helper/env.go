@@ -1,10 +1,11 @@
 package helper
 
-import "os"
+import (
+	"github.com/kodekoding/phastos/go/env"
+	"os"
+)
 
-const envKey = "ARTENV"
-
-var currentEnv = os.Getenv(envKey)
+var currentEnv = os.Getenv(env.Name)
 
 func GetEnv() string {
 	if currentEnv == "" {

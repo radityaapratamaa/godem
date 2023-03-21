@@ -1,16 +1,20 @@
 server:
-  port: 3000
+  port: 8000
+  read_timeout: 100
+  write_timeout: 100
+  max_header_byte:
+  environment: "development"
 
 jwt:
   public_key: "myPubl1Ck3Y"
 
 databases:
   master:
-    conn_string: "root:toor@tcp(localhost:3306)/profiling"
-    driver: "mysql"
+    conn_string: "username:password@tcp(host:port)/db_name"
+    engine: "mysql"
   follower:
-    driver: "mysql"
-    conn_string: "root:toor@tcp(localhost:3306)/profiling"
+    engine: "mysql"
+    conn_string: "username:password@tcp(host:port)/db_name"
 
 redis:
   address: ""
@@ -26,3 +30,7 @@ notifications:
   slack:
     is_active: false
     webhook_url: ""
+
+apps:
+  slack:
+    bot_token: ""

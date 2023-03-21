@@ -1,18 +1,19 @@
 package user
 
 import (
-	"godem/infrastructure/database/mocks/user"
+	mockuserdbrepo "godem/infrastructure/database/mocks/user"
 )
 
 var (
-	master *user.Masters
-	login  *user.Logins
-	uc     *Usecase
+	masterRepo *mockuserdbrepo.Masters
+	loginRepo  *mockuserdbrepo.Logins
+	loginUc    *login
+	masterUc   *master
 )
 
 func initTest() {
-	master = new(user.Masters)
-	login = new(user.Logins)
-
-	uc = New(master, login, "")
+	masterRepo = new(mockuserdbrepo.Masters)
+	loginRepo = new(mockuserdbrepo.Logins)
+	masterUc = newMaster(masterRepo)
+	loginUc = newLogin(loginRepo, "")
 }

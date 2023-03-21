@@ -1,33 +1,34 @@
 package helper
 
 import (
-	"encoding/json"
+	"github.com/pkg/errors"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
-	"github.com/pkg/errors"
+	"github.com/golang-jwt/jwt/v4"
+
+	"godem/domain/models/user"
 )
 
-func GenerateJWTToken(signingKey string, data interface{}) (string, int64, error) {
-	token := jwt.New(jwt.SigningMethodHS256)
+type ClaimData struct {
+	*user.Users
+	jwt.RegisteredClaims
+}
 
-	claimData := token.Claims.(jwt.MapClaims)
-	byteData, err := json.Marshal(data)
+func GenerateJWTToken(signingKey string, data *user.Users) (string, error) {
+	nowTime := time.Now()
+	expireTime := nowTime.Add(24 * time.Hour)
+
+	claimData := new(ClaimData)
+	claimData.Users = data
+	claimData.RegisteredClaims = jwt.RegisteredClaims{
+		ExpiresAt: jwt.NewNumericDate(expireTime),
+		Issuer:    "godem-backend",
+	}
+
+	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claimData)
+	token, err := tokenClaims.SignedString(signingKey)
 	if err != nil {
-		return "", 0, errors.Wrap(err, "usecase.user.login.setJWTClaims.MarshalData")
+		return "", errors.Wrap(err, "lib.helper.jwt.GenerateJWTToken.SignedString")
 	}
-
-	if err := json.Unmarshal(byteData, &claimData); err != nil {
-		return "", 0, errors.Wrap(err, "usecase.auth.jwt.setJWTClaims.UnmarshalToClaims")
-	}
-
-	claimData["auth_type"] = "login"
-	expired := time.Now().Add(time.Hour * 168).Unix()
-
-	claimData["expired"] = expired
-	jwtToken, err := token.SignedString([]byte(signingKey))
-	if err != nil {
-		return "", 0, errors.Wrap(err, "usecase.auth.jwt.setJWTClaims.SignedString")
-	}
-	return jwtToken, expired, nil
+	return token, nil
 }

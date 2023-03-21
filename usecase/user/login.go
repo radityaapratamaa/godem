@@ -40,13 +40,12 @@ func (l *login) Authenticate(ctx context.Context, requestData *user.LoginRequest
 		return nil, errors.Wrap(err, "usecase.user.login.Authenticate.DBCheck")
 	}
 
-	jwtToken, expired, err := generateJWTToken(l.jwtPubKey, data)
+	jwtToken, err := generateJWTToken(l.jwtPubKey, data)
 	if err != nil {
 		return nil, errors.Wrap(err, "usecase.user.login.Authenticate.GenerateJWTToken")
 	}
 
 	response := new(user.LoginResponse)
 	response.Token = jwtToken
-	response.Expired = expired
 	return response, nil
 }

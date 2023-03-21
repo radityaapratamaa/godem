@@ -2,14 +2,15 @@ package config
 
 import (
 	"fmt"
-	"godem/domain/models"
-	"godem/lib/helper"
 	"log"
 	"os"
 	"path/filepath"
 
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
+
+	"godem/domain/models"
+	"godem/lib/helper"
 )
 
 func New() (*models.Config, error) {
@@ -32,5 +33,7 @@ func New() (*models.Config, error) {
 	if err := yaml.NewDecoder(configFile).Decode(&configuration); err != nil {
 		return nil, errors.Wrap(err, "infrastructure.config.New.DecodeYaml")
 	}
+
+	configuration.Server.Environment = env
 	return &configuration, nil
 }

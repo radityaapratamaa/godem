@@ -25,7 +25,6 @@ services:
     networks:
       - apps
 
-
   redis:
     image: redis:latest
     ports:

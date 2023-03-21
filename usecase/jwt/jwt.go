@@ -4,11 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/golang-jwt/jwt/v4"
 	jwtmodel "godem/domain/models/jwt"
 	ctxinternal "godem/infrastructure/context"
 	"strings"
-
-	"github.com/dgrijalva/jwt-go"
 
 	"github.com/pkg/errors"
 )
