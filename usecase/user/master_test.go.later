@@ -1,0 +1,143 @@
+package user
+
+import (
+	"context"
+	"github.com/kodekoding/phastos/v2/go/database"
+	"testing"
+
+	"github.com/stretchr/testify/mock"
+
+	"github.com/kodekoding/phastos/v2/go/common"
+	usermodel "godem/domain/models/user"
+)
+
+func TestMaster_GetList(t *testing.T) {
+	initTest()
+
+	mockGetListResponse := []*usermodel.Data{{BaseColumn: database.BaseColumn[int64]{
+		Id: 1,
+	}}}
+	mockRequestData := &usermodel.Request{}
+	t.Run("Case 1 - Success", func(t *testing.T) {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Errorf("Should be Panic !!")
+			}
+		}()
+		masterRepo.On("GetList", mock.Anything, mock.Anything).
+			Return(mockGetListResponse, nil).Once()
+		_, _ = masterUc.GetList(context.Background(), mockRequestData)
+		//assert.Equal(t, expectedResult, actualResult)
+		//assert.Equal(t, false, err != nil)
+	})
+	t.Run("Case 2 - Failed", func(t *testing.T) {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Errorf("Should be Panic !!")
+			}
+		}()
+		masterRepo.On("GetList", mock.Anything, mock.Anything).
+			Return(nil, common.ErrPatch).Once()
+		_, _ = masterUc.GetList(context.Background(), mockRequestData)
+		//assert.Equal(t, nil, actualResult)
+		//assert.Equal(t, true, err != nil)
+	})
+}
+
+func TestMaster_GetDetailByID(t *testing.T) {
+	initTest()
+	t.Run("Case 1 - Success", func(t *testing.T) {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Errorf("Should be Panic !!")
+			}
+		}()
+		expectedResult := &usermodel.Data{
+			BaseColumn: database.BaseColumn[int64]{
+				Id: 1,
+			},
+		}
+		masterRepo.On("GetDetailByID", mock.Anything, mock.Anything).
+			Return(expectedResult, nil).Once()
+		_, _ = masterUc.GetDetailById(context.Background(), 1)
+		//assert.Equal(t, expectedResult, actualResult)
+		//assert.Equal(t, false, err != nil)
+	})
+	t.Run("Case 2 - Failed", func(t *testing.T) {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Errorf("Should be Panic !!")
+			}
+		}()
+		masterRepo.On("GetDetailByID", mock.Anything, mock.Anything).
+			Return(nil, common.ErrPatch).Once()
+		_, _ = masterUc.GetDetailById(context.Background(), 1)
+		//assert.Equal(t, nil, actualResult)
+		//assert.Equal(t, true, err != nil)
+	})
+}
+
+func TestMaster_CreateNew(t *testing.T) {
+	initTest()
+	mockRequestData := &usermodel.Data{}
+	t.Run("Case 1 - Success", func(t *testing.T) {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Errorf("Should be Panic !!")
+			}
+		}()
+		expectedResult := &database.CUDResponse{}
+		masterRepo.On("CreateNew", mock.Anything, mock.Anything).
+			Return(expectedResult, nil).Once()
+		_, _ = masterUc.Insert(context.Background(), mockRequestData)
+		//assert.Equal(t, expectedResult, actualResult)
+		//assert.Equal(t, false, err != nil)
+	})
+}
+
+func TestMaster_UpdateData(t *testing.T) {
+	initTest()
+	mockRequestData := &usermodel.Data{}
+	expectedResult := &database.CUDResponse{}
+	t.Run("Case 1 - Success", func(t *testing.T) {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Errorf("Should be Panic !!")
+			}
+		}()
+		masterRepo.On("UpdateData", mock.Anything, mock.Anything, mock.Anything).
+			Return(expectedResult, nil).Once()
+		_, _ = masterUc.Update(context.Background(), mockRequestData)
+		//assert.Equal(t, expectedResult, actualResult)
+		//assert.Equal(t, false, err != nil)
+	})
+	expectedResult = nil
+	t.Run("Case 2 - Failed Parse Interface", func(t *testing.T) {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Errorf("Should be Panic !!")
+			}
+		}()
+		newMockRequestData := &usermodel.LoginResponse{}
+		_, _ = masterUc.Update(context.Background(), newMockRequestData)
+		//assert.Equal(t, expectedResult, actualResult)
+		//assert.Equal(t, true, err != nil)
+	})
+}
+
+func TestMaster_DeleteData(t *testing.T) {
+	initTest()
+	t.Run("Case 1 - Success", func(t *testing.T) {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Errorf("Should be Panic !!")
+			}
+		}()
+		expectedResult := &database.CUDResponse{}
+		masterRepo.On("DeleteData", mock.Anything, mock.Anything).
+			Return(expectedResult, nil).Once()
+		_, _ = masterUc.Delete(context.Background(), 1)
+		//assert.Equal(t, expectedResult, actualResult)
+		//assert.Equal(t, false, err != nil)
+	})
+}
