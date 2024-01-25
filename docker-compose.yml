@@ -46,7 +46,7 @@ services:
       - postgresql-master
     volumes:
       - 'postgresql_slave_data:/bitnami/postgresql'
-      - ./config/postgres.conf:/opt/bitnami/postgresql/conf/postgresql.conf
+      - ./files/postgres.conf:/opt/bitnami/postgresql/conf/postgresql.conf
     environment:
       - POSTGRESQL_REPLICATION_MODE=slave
       - POSTGRESQL_REPLICATION_USER=postgres
