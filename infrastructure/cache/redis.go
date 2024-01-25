@@ -3,7 +3,6 @@ package cache
 import (
 	"context"
 	"godem/domain/models"
-	"sync"
 	"time"
 
 	redigo "github.com/gomodule/redigo/redis"
@@ -12,8 +11,7 @@ import (
 
 // Store object
 type Store struct {
-	Pool  Handler
-	mutex sync.Mutex
+	Pool Handler
 }
 
 // Handler handler for cache

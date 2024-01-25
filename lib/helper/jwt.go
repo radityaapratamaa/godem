@@ -1,34 +1,25 @@
 package helper
 
 import (
-	"github.com/pkg/errors"
-	"time"
-
-	"github.com/golang-jwt/jwt/v4"
-
+	"context"
+	"encoding/json"
+	context2 "github.com/kodekoding/phastos/v2/go/context"
 	"godem/domain/models/user"
 )
 
-type ClaimData struct {
-	*user.Users
-	jwt.RegisteredClaims
-}
-
-func GenerateJWTToken(signingKey string, data *user.Users) (string, error) {
-	nowTime := time.Now()
-	expireTime := nowTime.Add(24 * time.Hour)
-
-	claimData := new(ClaimData)
-	claimData.Users = data
-	claimData.RegisteredClaims = jwt.RegisteredClaims{
-		ExpiresAt: jwt.NewNumericDate(expireTime),
-		Issuer:    "godem-backend",
+func GetJWTData(ctx context.Context) *user.JWTData {
+	getJWTData := context2.GetJWT(ctx)
+	if getJWTData == nil {
+		return nil
 	}
 
-	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claimData)
-	token, err := tokenClaims.SignedString(signingKey)
-	if err != nil {
-		return "", errors.Wrap(err, "lib.helper.jwt.GenerateJWTToken.SignedString")
+	jwtData, valid := getJWTData.Data.(map[string]interface{})
+	if !valid {
+		return nil
 	}
-	return token, nil
+
+	b, _ := json.Marshal(jwtData)
+	var result user.JWTData
+	_ = json.Unmarshal(b, &result)
+	return &result
 }

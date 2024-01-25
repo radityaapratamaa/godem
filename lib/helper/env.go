@@ -1,23 +1,20 @@
 package helper
 
 import (
-	"github.com/kodekoding/phastos/go/env"
 	"os"
+
+	"github.com/kodekoding/phastos/v2/go/env"
 )
 
 var currentEnv = os.Getenv(env.Name)
 
 func GetEnv() string {
 	if currentEnv == "" {
-		currentEnv = "development"
-		return "development"
+		currentEnv = env.LocalEnv
 	}
 	return currentEnv
 }
 
-func IsDevelopment() bool {
-	if currentEnv == "development" {
-		return true
-	}
-	return false
+func IsLocal() bool {
+	return currentEnv == env.LocalEnv
 }

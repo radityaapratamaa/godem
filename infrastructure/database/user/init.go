@@ -1,23 +1,23 @@
 package user
 
-import "github.com/kodekoding/phastos/go/database"
+import "github.com/kodekoding/phastos/v2/go/database"
 
 type Repositories interface {
-	Login() Logins
+	Auth() Auths
 	Master() Masters
 }
 
 type Repository struct {
-	login  Logins
+	auth   Auths
 	master Masters
 }
 
-func New(db *database.SQL) Repositories {
-	return &Repository{login: newLogin(db), master: newMaster(db)}
+func New(db database.ISQL) Repositories {
+	return &Repository{auth: newAuth(db), master: newMaster(db)}
 }
 
-func (r Repository) Login() Logins {
-	return r.login
+func (r Repository) Auth() Auths {
+	return r.auth
 }
 
 func (r Repository) Master() Masters {

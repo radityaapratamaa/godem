@@ -1,9 +1,10 @@
 package models
 
 import (
-	"github.com/kodekoding/phastos/go/database"
-	"github.com/kodekoding/phastos/go/notifications"
-	"github.com/kodekoding/phastos/go/server"
+	"github.com/kodekoding/phastos/v2/go/database"
+	"github.com/kodekoding/phastos/v2/go/mail"
+	"github.com/kodekoding/phastos/v2/go/notifications"
+	"github.com/kodekoding/phastos/v2/go/server"
 )
 
 type Config struct {
@@ -12,7 +13,8 @@ type Config struct {
 	Databases     database.SQLs        `yaml:"databases"`
 	Redis         RedisCfg             `yaml:"redis"`
 	Notifications notifications.Config `yaml:"notifications"`
-	Apps          ThirdPartyApps       `yaml:"apps"`
+	Apps          ThirdPartyApps       `yaml:"third_party"`
+	Mail          mail.Config          `yaml:"mail"`
 }
 
 type ThirdPartyApps struct {
@@ -20,7 +22,11 @@ type ThirdPartyApps struct {
 }
 
 type Slack struct {
-	BotToken string `yaml:"bot_token"`
+	SocketMode   bool   `yaml:"socketmode"`
+	BotToken     string `yaml:"bot_token"`
+	AppToken     string `yaml:"app_token"`
+	ClientID     string `yaml:"client_id"`
+	ClientSecret string `yaml:"client_secret"`
 }
 
 type ServerConfig struct {

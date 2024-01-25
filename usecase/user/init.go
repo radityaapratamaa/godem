@@ -1,21 +1,33 @@
 package user
 
-import "godem/infrastructure/database/user"
+import (
+	"embed"
+	"github.com/kodekoding/phastos/v2/go/cache"
+	"github.com/kodekoding/phastos/v2/go/database"
+	"github.com/kodekoding/phastos/v2/go/mail"
+	"godem/infrastructure/database/user"
+)
 
 type Usecases interface {
 	Master() Masters
-	Login() Logins
+	Auth() Auths
 }
 
 type Usecase struct {
 	master Masters
-	login  Logins
+	auth   Auths
 }
 
-func New(userRepo user.Repositories, jwtPubKey string) *Usecase {
+func New(
+	userRepo user.Repositories,
+	smtp mail.SMTPs,
+	templateFolder embed.FS,
+	trx database.Transactions,
+	cache cache.Caches,
+) *Usecase {
 	return &Usecase{
-		master: newMaster(userRepo.Master()),
-		login:  newLogin(userRepo.Login(), jwtPubKey),
+		master: newMaster(userRepo.Master(), trx),
+		auth:   newAuth(userRepo.Auth(), smtp, templateFolder, cache),
 	}
 }
 
@@ -23,6 +35,6 @@ func (u *Usecase) Master() Masters {
 	return u.master
 }
 
-func (u *Usecase) Login() Logins {
-	return u.login
+func (u *Usecase) Auth() Auths {
+	return u.auth
 }

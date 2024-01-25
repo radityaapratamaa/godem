@@ -7,33 +7,34 @@ import (
 	"path/filepath"
 
 	"github.com/pkg/errors"
-	"gopkg.in/yaml.v2"
-
 	"godem/domain/models"
 	"godem/lib/helper"
+	"gopkg.in/yaml.v2"
 )
 
-func New() (*models.Config, error) {
+var Cfg models.Config
+
+func New() error {
 	var (
 		env      = helper.GetEnv()
 		filename = fmt.Sprintf("%s.yaml", env)
 	)
 
 	pwd, _ := os.Getwd()
-	filepath := filepath.Join(pwd, "files/", filename)
-	log.Println("reading config file: ", filepath)
+	configFilePath := filepath.Join(pwd, "files/config", filename)
+	log.Println("reading config file: ", configFilePath)
 
-	configFile, err := os.Open(filepath)
+	filePath := filepath.Clean(configFilePath)
+	configFile, err := os.Open(filePath)
 	if err != nil {
-		return nil, errors.Wrap(err, "infrastructure.config.New.OpenFile")
+		return errors.Wrap(err, "infrastructure.config.New.OpenFile")
 	}
 	defer configFile.Close()
 
-	var configuration models.Config
-	if err := yaml.NewDecoder(configFile).Decode(&configuration); err != nil {
-		return nil, errors.Wrap(err, "infrastructure.config.New.DecodeYaml")
+	if err := yaml.NewDecoder(configFile).Decode(&Cfg); err != nil {
+		return errors.Wrap(err, "infrastructure.config.New.DecodeYaml")
 	}
 
-	configuration.Server.Environment = env
-	return &configuration, nil
+	Cfg.Server.Environment = env
+	return nil
 }
