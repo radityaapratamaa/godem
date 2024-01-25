@@ -1,5 +1,10 @@
 version: '3.2'
 volumes:
+  pg-data:
+  postgresql_master_data:
+    driver: host
+  postgresql_slave_data:
+    driver: host
   locals:
     driver: ${VOLUME_DRIVER}
 networks:
@@ -7,6 +12,49 @@ networks:
     driver: ${NETWORK_DRIVER}
 
 services:
+  redis:
+    container_name: redis
+    image: redis
+    restart: always
+    ports:
+      - 32770:6379
+  postgresql-master:
+    platform: linux/arm64
+    container_name: postgresql-master
+    image: docker.io/bitnami/postgresql:14.9.0
+    restart: always
+    ports:
+      - 32771:5432
+    volumes:
+      - 'postgresql_master_data:/bitnami/postgresql'
+    environment:
+      - POSTGRESQL_REPLICATION_MODE=master
+      - POSTGRESQL_REPLICATION_USER=postgres
+      - POSTGRESQL_REPLICATION_PASSWORD=postgres
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_PASSWORD=postgres
+      - ALLOW_EMPTY_PASSWORD=yes
+      - POSTGRESQL_SYNCHRONOUS_COMMIT_MODE=off
+  postgresql-slave:
+    platform: linux/arm64
+    container_name: postgresql-slave
+    restart: always
+    image: docker.io/bitnami/postgresql:14.9.0
+    ports:
+      - 32772:5432
+    depends_on:
+      - postgresql-master
+    volumes:
+      - 'postgresql_slave_data:/bitnami/postgresql'
+      - ./config/postgres.conf:/opt/bitnami/postgresql/conf/postgresql.conf
+    environment:
+      - POSTGRESQL_REPLICATION_MODE=slave
+      - POSTGRESQL_REPLICATION_USER=postgres
+      - POSTGRESQL_REPLICATION_PASSWORD=postgres
+      - POSTGRESQL_MASTER_HOST=postgresql-master
+      - POSTGRESQL_PASSWORD=postgres
+      - POSTGRESQL_MASTER_PORT_NUMBER=5432
+      - ALLOW_EMPTY_PASSWORD=yes
   db:
     build:
       context: ./.docker/mysql
@@ -24,8 +72,3 @@ services:
       - "${MYSQL_PORT}:3306"
     networks:
       - apps
-
-  redis:
-    image: redis:latest
-    ports:
-      - 6379:6379
