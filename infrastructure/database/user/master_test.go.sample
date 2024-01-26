@@ -1,0 +1,213 @@
+package user
+
+import (
+	"context"
+	"github.com/kodekoding/phastos/v2/go/database"
+	"godem/domain/models"
+	"godem/domain/models/user"
+	"godem/infrastructure/common"
+	"godem/infrastructure/database/mocks"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+)
+
+func TestMaster_GetList(t *testing.T) {
+	initTest()
+
+	mockRequest := new(database.QueryOpts)
+	var mockParams []interface{}
+	for i := 0; i < 6; i++ {
+		mockParams = append(mockParams, mock.Anything)
+	}
+	t.Run("Case 1 - Success", func(t *testing.T) {
+		expectedResult := []*user.Users{
+			{ID: 1},
+		}
+		mockRequest.Result = &expectedResult
+		masterRepo.On("Rebind", mock.Anything).Return("").Once()
+		followerRepo.On(StrSelectContext, mockParams...).
+			Return(func(ctx context.Context, dest interface{}, query string, args ...interface{}) error {
+				data := dest.(*[]*user.Users)
+				*data = expectedResult
+				return nil
+			}).Once()
+
+		err := masterUser.GetList(context.Background(1), mockRequest)
+		assert.Equal(t, expectedResult, mockRequest.Result)
+		assert.Equal(t, false, err != nil)
+	})
+	t.Run("Case 2 - Failed", func(t *testing.T) {
+
+		masterRepo.On("Rebind", mock.Anything).Return("").Once()
+		followerRepo.On(StrSelectContext, mockParams...).
+			Return(common.ErrPatch).Once()
+
+		err := masterUser.GetList(context.Background(1), mockRequest)
+		assert.Equal(t, nil, mockRequest.Result)
+		assert.Equal(t, true, err != nil)
+	})
+
+	t.Run("Case 3 - Failed Parse Interface", func(t *testing.T) {
+		newMockReq := &user.LoginRequest{}
+		err := masterUser.GetList(context.Background(1), newMockReq)
+		assert.Equal(t, nil, actualResult)
+		assert.Equal(t, true, err != nil)
+	})
+}
+
+func TestMaster_GetDetailByID(t *testing.T) {
+	initTest()
+	mockRequest := int64(1)
+	var mockParams []interface{}
+	for i := 0; i < 4; i++ {
+		mockParams = append(mockParams, mock.Anything)
+	}
+	t.Run("Case 1 - Success", func(t *testing.T) {
+		expectedResult := &user.Users{
+			ID: 1,
+		}
+
+		masterRepo.On("Rebind", mock.Anything).Return("").Once()
+		followerRepo.On(StrGetContext, mockParams...).
+			Return(func(ctx context.Context, dest interface{}, query string, args ...interface{}) error {
+				data := dest.(*user.Users)
+				*data = *expectedResult
+				return nil
+			}).Once()
+
+		actualResult, err := masterUser.GetDetailByID(context.Background(1), mockRequest)
+		assert.Equal(t, expectedResult, actualResult)
+		assert.Equal(t, false, err != nil)
+	})
+	t.Run("Case 2 - Failed", func(t *testing.T) {
+
+		masterRepo.On("Rebind", mock.Anything).Return("").Once()
+		followerRepo.On(StrGetContext, mockParams...).
+			Return(common.ErrPatch).Once()
+
+		actualResult, err := masterUser.GetDetailByID(context.Background(1), mockRequest)
+		assert.Equal(t, nil, actualResult)
+		assert.Equal(t, true, err != nil)
+	})
+}
+
+func TestMaster_CreateNew(t *testing.T) {
+	initTest()
+	mockRequest := &user.Users{}
+	var mockParams []interface{}
+	for i := 0; i < 9; i++ {
+		mockParams = append(mockParams, mock.Anything)
+	}
+	mockSQLResult := mocks.SQLResult{}
+	expectedResult := &models.CUDResponse{
+		Status:       true,
+		RowsAffected: 1,
+		LastInsertID: 1,
+	}
+	t.Run("Case 1 - Success", func(t *testing.T) {
+		masterRepo.On("Rebind", mock.Anything).Return("").Once()
+		masterRepo.On(StrExecContext, mockParams...).
+			Return(mockSQLResult, nil).Once()
+
+		actualResult, err := masterUser.CreateNew(context.Background(1), mockRequest)
+		assert.Equal(t, expectedResult, actualResult)
+		assert.Equal(t, false, err != nil)
+	})
+	expectedResult = nil
+	t.Run("Case 2 - Failed", func(t *testing.T) {
+
+		masterRepo.On("Rebind", mock.Anything).Return("").Once()
+		masterRepo.On(StrExecContext, mockParams...).
+			Return(nil, common.ErrPatch).Once()
+
+		actualResult, err := masterUser.CreateNew(context.Background(1), mockRequest)
+		assert.Equal(t, expectedResult, actualResult)
+		assert.Equal(t, true, err != nil)
+	})
+
+	t.Run("Case 3 - Failed Parse Interface", func(t *testing.T) {
+		newMockReq := &user.LoginRequest{}
+		actualResult, err := masterUser.CreateNew(context.Background(1), newMockReq)
+		assert.Equal(t, expectedResult, actualResult)
+		assert.Equal(t, true, err != nil)
+	})
+}
+
+func TestMaster_UpdateData(t *testing.T) {
+	initTest()
+	mockRequest := &user.Users{}
+	mockID := int64(1)
+	var mockParams []interface{}
+	for i := 0; i < 9; i++ {
+		mockParams = append(mockParams, mock.Anything)
+	}
+	mockSQLResult := mocks.SQLResult{}
+	expectedResult := &models.CUDResponse{
+		Status:       true,
+		RowsAffected: 1,
+		LastInsertID: 1,
+	}
+	t.Run("Case 1 - Success", func(t *testing.T) {
+		masterRepo.On("Rebind", mock.Anything).Return("").Once()
+		masterRepo.On(StrExecContext, mockParams...).
+			Return(mockSQLResult, nil).Once()
+
+		actualResult, err := masterUser.UpdateData(context.Background(1), mockRequest, mockID)
+		assert.Equal(t, expectedResult, actualResult)
+		assert.Equal(t, false, err != nil)
+	})
+	expectedResult = nil
+	t.Run("Case 2 - Failed", func(t *testing.T) {
+
+		masterRepo.On("Rebind", mock.Anything).Return("").Once()
+		masterRepo.On(StrExecContext, mockParams...).
+			Return(nil, common.ErrPatch).Once()
+
+		actualResult, err := masterUser.UpdateData(context.Background(1), mockRequest, mockID)
+		assert.Equal(t, expectedResult, actualResult)
+		assert.Equal(t, true, err != nil)
+	})
+	t.Run("Case 3 - Failed Parse Interface", func(t *testing.T) {
+		newMockReq := &user.LoginRequest{}
+		actualResult, err := masterUser.UpdateData(context.Background(1), newMockReq, mockID)
+		assert.Equal(t, expectedResult, actualResult)
+		assert.Equal(t, true, err != nil)
+	})
+}
+
+func TestMaster_DeleteData(t *testing.T) {
+	initTest()
+	mockID := int64(1)
+	var mockParams []interface{}
+	for i := 0; i < 3; i++ {
+		mockParams = append(mockParams, mock.Anything)
+	}
+	mockSQLResult := mocks.SQLResult{}
+	expectedResult := &models.CUDResponse{
+		Status:       true,
+		RowsAffected: 1,
+		LastInsertID: 1,
+	}
+	t.Run("Case 1 - Success", func(t *testing.T) {
+		masterRepo.On("Rebind", mock.Anything).Return("").Once()
+		masterRepo.On(StrExecContext, mockParams...).
+			Return(mockSQLResult, nil).Once()
+
+		actualResult, err := masterUser.DeleteData(context.Background(1), mockID)
+		assert.Equal(t, expectedResult, actualResult)
+		assert.Equal(t, false, err != nil)
+	})
+	expectedResult = nil
+	t.Run("Case 2 - Failed", func(t *testing.T) {
+
+		masterRepo.On("Rebind", mock.Anything).Return("").Once()
+		masterRepo.On(StrExecContext, mockParams...).
+			Return(nil, common.ErrPatch).Once()
+
+		actualResult, err := masterUser.DeleteData(context.Background(1), mockID)
+		assert.Equal(t, expectedResult, actualResult)
+		assert.Equal(t, true, err != nil)
+	})
+}
