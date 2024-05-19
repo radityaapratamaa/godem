@@ -6,7 +6,7 @@ import (
 
 	"github.com/joho/godotenv"
 
-	"godem/infrastructure/loader"
+	"godem/src/loader"
 )
 
 //go:embed files/*
